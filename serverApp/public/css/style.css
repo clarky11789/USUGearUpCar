@@ -1,0 +1,47 @@
+.float_center {
+  float: left;
+
+  text-align: left;
+}
+.float_center > .child {
+  position: relative;
+  left: 50%;
+}
+.long_boxes {
+  font-family: "Arial", sans-serif;
+  text-align:center;
+}
+.info_boxes {
+  font-family: "Arial", sans-serif;
+  text-align:center; 
+  padding: 20px; 
+  border: 5px 
+  solid #fff;
+}
+.info_box_color {
+  background-color: #DEE2E5;
+}
+.graph-boxes{
+  height: 300px;
+  border: 2px solid black;
+}
+.canvas-thingy{
+  vertical-align: middle;
+  padding:0; 
+  margin:0; 
+  max-width:100%; 
+  max-height:100%
+}
+.button-style{
+  border: 1px solid black;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+button:disabled,
+button[disabled] {
+  color : white;
+  background-color: #5a6872;
+} 
