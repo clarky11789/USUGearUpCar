@@ -27,6 +27,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -94,15 +95,18 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         url = "http://ec2-54-187-254-25.us-west-2.compute.amazonaws.com:3000";
         //url = "http://localhost:3000";
 
-        postHandler.postDelayed(new Runnable() {
+       /* postHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 postData();
                 postHandler.postDelayed(this, 250);
             }
-        }, 250);
+        }, 250);*/
 
         super.onCreate(savedInstanceState);
+        /*if(savedInstanceState!=null){
+
+        }*/
         setContentView(R.layout.activity_main);
 
         //text = (TextView)findViewById(R.id.speedTextDesc);
@@ -351,6 +355,22 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         });
     }
 
+    public void Display1(ArrayList<String> disspeed, ArrayList<String> disspeed ){
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //text.setText("just got" + s + "\n");
+                String speedVal =  String.valueOf((int) Double.parseDouble(speed.get(speed.size() - 1)));
+                if(latestCharge != null){
+                    String chargeVal =  String.valueOf( (int) ((latestCharge.first/batteryCapacity)*100));
+                    chargeText.setText(chargeVal);
+                }
+                speedText.setText(speedVal);
+                currentText.setText(current.get(current.size() - 1));
+                voltageText.setText(voltage.get(voltage.size() - 1));
+            }
+        });
+    }
     @Override
     public void onConnect(BluetoothDevice device) {
         Display("Connected to "+device.getName()+" - "+device.getAddress());
@@ -378,9 +398,11 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         }
         if(findNum[0].equals("MPH")){
             latestSpeed = new Pair<>(Double.parseDouble(findNum[1]), timestamp);
+            //speedText.setText(findNum[1]);
             speed.add(findNum[1]);
             findNum[0] = "speed";
         } else if(findNum[0].equals("current")){
+            //currentText.setText(findNum[1]);
             latestCurrent = new Pair<>(Double.parseDouble(findNum[1]), timestamp);
             current.add(findNum[1]);
         } else if(findNum[0].equals("INPUT V")){
@@ -395,7 +417,9 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
             }
             findNum[1] = String.valueOf(latestCharge);
             charge.add(findNum[1]);
+            //chargeText.setText(findNum[1]);
         }
+        Display1(speed, current, voltage,charge);
     }
 
     @Override

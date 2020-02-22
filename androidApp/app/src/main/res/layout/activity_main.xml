@@ -1,113 +1,207 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/darker_gray"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".Chat">
 
-    <TextView
-        android:id="@+id/speedText"
-        android:layout_width="281dp"
-        android:layout_height="156dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="70dp"
-        android:layout_marginBottom="546dp"
-        android:background="@android:color/black"
-        android:textColor="@android:color/white"
-        android:textSize="100sp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/chargeText"
-        android:layout_width="325dp"
-        android:layout_height="156dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="100dp"
-        android:layout_marginBottom="305dp"
-        android:background="@android:color/black"
-        android:textColor="@android:color/white"
-        android:textSize="100sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/currentTextDesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="320dp"
-        android:layout_marginBottom="50dp"
-        android:background="@color/bg"
-        android:text="Current"
-        android:textColor="@android:color/white"
-        android:textSize="30sp" />
+            <TextView
+                android:id="@+id/voltageTextDesc"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/bg"
+                android:gravity="center_vertical"
+                android:text="Voltage:"
+                android:textAlignment="viewEnd"
+                android:textColor="@android:color/white"
+                android:textSize="40sp" />
 
-    <TextView
-        android:id="@+id/currentText"
-        android:layout_width="105dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="450dp"
-        android:layout_marginBottom="50dp"
-        android:background="@android:color/black"
-        android:textColor="@android:color/white"
-        android:textSize="30sp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/voltageTextDesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="50dp"
-        android:layout_marginBottom="50dp"
-        android:background="@color/bg"
-        android:text="Voltage"
-        android:textColor="@android:color/white"
-        android:textSize="30sp" />
+                <TextView
+                    android:id="@+id/voltageText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/black"
+                    android:gravity="center_vertical"
+                    android:textAlignment="textStart"
+                    android:textColor="@android:color/white"
+                    android:textSize="36sp" />
 
-    <TextView
-        android:id="@+id/voltageText"
-        android:layout_width="105dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="175dp"
-        android:layout_marginBottom="50dp"
-        android:background="@android:color/black"
-        android:textColor="@android:color/white"
-        android:textSize="30sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/background_dark"
+                    android:gravity="center_vertical"
+                    android:text="V"
+                    android:textColor="@android:color/white"
+                    android:textSize="50sp" />
+            </LinearLayout>
 
-    <TextView
-        android:id="@+id/MPH"
-        android:layout_width="wrap_content"
-        android:layout_height="156dp"
-        android:layout_alignStart="@+id/speedText"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="240dp"
-        android:layout_marginBottom="546dp"
-        android:background="@android:color/background_dark"
-        android:text="MPH"
-        android:textColor="@android:color/white"
-        android:textSize="100sp" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/Percentage"
-        android:layout_width="wrap_content"
-        android:layout_height="156dp"
-        android:layout_alignStart="@+id/chargeText"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="308dp"
-        android:layout_marginBottom="305dp"
-        android:background="@android:color/background_dark"
-        android:text="%"
-        android:textColor="@android:color/white"
-        android:textSize="100sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/speedTextDesc"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/bg"
+                android:gravity="center_vertical"
+                android:text="Speed:"
+                android:textAlignment="viewEnd"
+                android:textColor="@android:color/white"
+                android:textSize="40sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/speedText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/black"
+                    android:gravity="center_vertical"
+                    android:textAlignment="textStart"
+                    android:textColor="@android:color/white"
+                    android:textSize="36sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/background_dark"
+                    android:gravity="center_vertical"
+                    android:text="MPH"
+                    android:textColor="@android:color/white"
+                    android:textSize="50sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/chargeTextDesc"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/bg"
+                android:gravity="center_vertical"
+                android:text="Charge:"
+                android:textAlignment="viewEnd"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="@android:color/white"
+                android:textSize="40sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/chargeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/black"
+                    android:gravity="center_vertical"
+                    android:textAlignment="textStart"
+                    android:textColor="@android:color/white"
+                    android:textSize="36sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/background_dark"
+                    android:gravity="center_vertical"
+                    android:text="%"
+                    android:textColor="@android:color/white"
+                    android:textSize="50sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/currentTextDesc"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/bg"
+                android:gravity="center_vertical"
+                android:text="Current:"
+                android:textAlignment="viewEnd"
+                android:textColor="@android:color/white"
+                android:textSize="40sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/currentText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/black"
+                    android:gravity="center_vertical"
+                    android:textAlignment="textStart"
+                    android:textColor="@android:color/white"
+                    android:textSize="36sp" />
+
+                <TextView
+                    android:id="@+id/A"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/background_dark"
+                    android:gravity="center_vertical"
+                    android:text="A"
+                    android:textColor="@android:color/white"
+                    android:textSize="50sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 
-</RelativeLayout>
+</FrameLayout>

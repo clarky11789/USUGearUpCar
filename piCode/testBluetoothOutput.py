@@ -12,7 +12,7 @@ port = server_sock.getsockname()[1]
 
 print("Waiting for device...")
 
-client_sock, client_info = server_sock.accept(1)
+client_sock, client_info = server_sock.accept(2)
 print("Accepted connection from ", client_info)
 
 #vars
