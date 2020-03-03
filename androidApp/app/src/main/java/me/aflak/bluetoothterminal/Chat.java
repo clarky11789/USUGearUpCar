@@ -1,58 +1,66 @@
 package me.aflak.bluetoothterminal;
 
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-//import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-//import android.widget.Button;
-//import android.widget.EditText;
-import android.widget.EditText;
+
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import me.aflak.bluetooth.Bluetooth;
 
+import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import static java.lang.System.exit;
+
 public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCallback {
     private ArrayList<String> speed = new ArrayList<>();
     private ArrayList<String> charge = new ArrayList<>();
     private ArrayList<String> current = new ArrayList<>();
     private ArrayList<String> voltage = new ArrayList<>();
+    private ArrayList<String> time = new ArrayList<>();
     Map<Integer, Map<String, String>> unsentData = new HashMap<>();
     ArrayList<Integer> unsentDataList = new ArrayList<>();
     Integer batteryCapacity;
@@ -63,10 +71,8 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
     Pair<Double, String> latestVoltage;
     Pair<Double, String> latestCharge;
     Integer unsentDataId;
-    //private String name;
+
     private Bluetooth b;
-    //private EditText message;
-    //private Button send;
     private TextView text;
     private TextView speedText;
     private TextView chargeText;
@@ -74,6 +80,13 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
     private TextView voltageText;
     private ScrollView scrollView;
     private boolean registered=false;
+
+    final static String speedfileName = "speedData.txt";
+    final static String currentfileName = "currentData.txt";
+    final static String chargefileName = "chargeData.txt";
+    final static String voltagefileName = "voltageData.txt";
+    final static String timefileName = "timeData.txt";
+    final static String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/instinctcoder/readwrite/" ;
 
     Handler postHandler = new Handler();
 
@@ -85,41 +98,18 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         voltage.add("0");
         carId = "1";
         unsentDataId = 0;
-        latestVoltage = null;
-        latestCurrent = null;
-        latestCharge = null;
-        latestSpeed = null;
-        batteryCapacity = 3110400;
-        //Bundle bundle = getIntent().getExtras();
-        //url = "http://"+bundle.getString("ipAddress")+":3000";
-        url = "http://ec2-54-187-254-25.us-west-2.compute.amazonaws.com:3000";
-        //url = "http://localhost:3000";
 
-       /* postHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                postData();
-                postHandler.postDelayed(this, 250);
-            }
-        }, 250);*/
+        batteryCapacity = 3110400;
 
         super.onCreate(savedInstanceState);
-        /*if(savedInstanceState!=null){
 
-        }*/
         setContentView(R.layout.activity_main);
 
-        //text = (TextView)findViewById(R.id.speedTextDesc);
         speedText = (TextView)findViewById(R.id.speedText);
         chargeText = (TextView)findViewById(R.id.chargeText);
         currentText = (TextView)findViewById(R.id.currentText);
         voltageText = (TextView)findViewById(R.id.voltageText);
-        //message = (EditText)findViewById(R.id.message);
-        //send = (Button)findViewById(R.id.send);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
-
-        //text.setMovementMethod(new ScrollingMovementMethod());
-        //send.setEnabled(false);
 
         b = new Bluetooth(this);
         b.enableBluetooth();
@@ -127,21 +117,10 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         b.setCommunicationCallback(this);
 
         int pos = getIntent().getExtras().getInt("pos");
-        //name = b.getPairedDevices().get(pos).getName();
 
-        Display("Connecting...");
+        Display1(String.valueOf((int) Double.parseDouble(speed.get(speed.size() - 1))), current.get(current.size() - 1), voltage.get(voltage.size() - 1),charge.get(charge.size() - 1));
         b.connectToDevice(b.getPairedDevices().get(pos));
-        /*
-        send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String msg = message.getText().toString();
-                message.setText("");
-                b.send(msg);
-                Display("You: "+msg);
-            }
-        });
-        */
+
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, filter);
         registered=true;
@@ -156,151 +135,25 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         }
     }
 
-    public void postData(){
-        Display("this is a message");
-        if(latestSpeed != null){
-            postSpeed();
-            latestSpeed = new Pair<>(0.0, String.valueOf(System.currentTimeMillis()/1000));;
-        }
-        if(latestCharge != null){
-            postCharge();
-            latestCharge = null;
-        }
-        if(latestVoltage != null){
-            postVoltage();
-            latestVoltage = null;
-        }
-        if(latestCurrent != null){
-            postCurrent();
-            latestCurrent = null;
-        }
-    }
-
-    private void postSpeed(){
-        Map<String, String> postData = new HashMap<>();
-        postData.put("carId", carId);
-        postData.put("indicator", "spe");
-        postData.put("val", String.valueOf(latestSpeed.first));
-        postData.put("timeStamp", latestSpeed.second);
-        HttpPostAsyncTask task = new HttpPostAsyncTask(postData);
-        task.execute( url + "/update");
-    }
-
-    private void postCharge(){
-        Map<String, String> postData = new HashMap<>();
-        postData.put("carId", carId);
-        postData.put("indicator", "cha");
-        postData.put("val", String.valueOf(latestCharge.first));
-        postData.put("timeStamp", latestCharge.second);
-        HttpPostAsyncTask task = new HttpPostAsyncTask(postData);
-        task.execute( url + "/update");
-    }
-
-    private void postCurrent(){
-        Map<String, String> postData = new HashMap<>();
-        postData.put("carId", carId);
-        postData.put("indicator", "cur");
-        postData.put("val", String.valueOf(latestCurrent.first));
-        postData.put("timeStamp", latestCurrent.second);
-        HttpPostAsyncTask task = new HttpPostAsyncTask(postData);
-        task.execute( url + "/update");
-    }
-
-    private void postVoltage(){
-        Map<String, String> postData = new HashMap<>();
-        postData.put("carId", carId);
-        postData.put("indicator", "vol");
-        postData.put("val", String.valueOf(latestVoltage.first));
-        postData.put("timeStamp", latestVoltage.second);
-        HttpPostAsyncTask task = new HttpPostAsyncTask(postData);
-        task.execute( url + "/update");
-    }
-
-    private class HttpPostAsyncTask extends AsyncTask<String, Void, String> {
-        // This is the JSON body of the post
-        JSONObject postData;
-        Integer postDataId;
-
-        // This is a constructor that allows you to pass in the JSON body
-        public HttpPostAsyncTask(Map<String, String> postData) {
-            if (postData != null) {
-                this.postData = new JSONObject(postData);
+    //final static String TAG = FileHelper.class.getName();
+    public static boolean saveToFile( String data, String fileName){
+        try {
+            new File("/sdcard/Download/data").mkdir();
+            File file = new File("/sdcard/Download/data"+ fileName);
+            if (!file.exists()) {
+                file.createNewFile();
             }
+            FileOutputStream fileOutputStream = new FileOutputStream(file,true);
+            fileOutputStream.write((data + System.getProperty("line.separator")).getBytes());
+
+            fileOutputStream.close();
+            return true;
+        }  catch(FileNotFoundException ex) {
+            exit(1);
+        }  catch(IOException ex) {
+            exit(1);
         }
-
-        private String convertInputStreamToString(InputStream inputStream) {
-            BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            try {
-                while((line = bufferedReader.readLine()) != null) {
-                    sb.append(line);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return sb.toString();
-        }
-        // This is a function that we are overriding from AsyncTask. It takes Strings as parameters because that is what we defined for the parameters of our async task
-        @Override
-        protected String doInBackground(String... params) {
-
-            try {
-                // This is getting the url from the string we passed in
-                URL url = new URL(params[0]);
-
-                // Create the urlConnection
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-
-                urlConnection.setDoInput(true);
-                urlConnection.setDoOutput(true);
-
-                urlConnection.setRequestProperty("Content-Type", "application/json");
-
-                urlConnection.setRequestMethod("POST");
-
-
-                // OPTIONAL - Sets an authorization header
-                urlConnection.setRequestProperty("Authorization", "someAuthString");
-
-                // Send the post body
-                if (this.postData != null) {
-                    OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
-                    writer.write(postData.toString());
-                    writer.flush();
-                }
-
-                int statusCode = urlConnection.getResponseCode();
-
-                if (statusCode ==  200) {
-
-                    InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
-
-                    String response = convertInputStreamToString(inputStream);
-
-                    return "good";
-                } else {
-                    return "not";
-                }
-
-            } catch (Exception e) {
-                //Log.d("sendData", e.getLocalizedMessage());
-                return "not";
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            // Call activity method with results
-            if(result == "good"){ //if it went well, remove data from the map
-                Log.i("post", "sending data worked");
-                //unsentData.remove(this.postDataId);
-            } else if (result == "not") {// if not, add id back to list to be tried again
-                Log.i("post", "sending data did not work");
-                //unsentDataList.add(0, this.postDataId);
-            }
-        }
+        return  false;
     }
 
     @Override
@@ -338,55 +191,24 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         }
     }
 
-    public void Display(final String s){
+    public void Display1(final String speedVal,final String discurrent,final String disvoltage,final String discharge  ){
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                //text.setText("just got" + s + "\n");
-                String speedVal =  String.valueOf((int) Double.parseDouble(speed.get(speed.size() - 1)));
-                if(latestCharge != null){
-                    String chargeVal =  String.valueOf( (int) ((latestCharge.first/batteryCapacity)*100));
-                    chargeText.setText(chargeVal);
-                }
+                chargeText.setText(discharge);
                 speedText.setText(speedVal);
-                currentText.setText(current.get(current.size() - 1));
-                voltageText.setText(voltage.get(voltage.size() - 1));
-            }
-        });
-    }
-
-    public void Display1(ArrayList<String> disspeed, ArrayList<String> disspeed ){
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                //text.setText("just got" + s + "\n");
-                String speedVal =  String.valueOf((int) Double.parseDouble(speed.get(speed.size() - 1)));
-                if(latestCharge != null){
-                    String chargeVal =  String.valueOf( (int) ((latestCharge.first/batteryCapacity)*100));
-                    chargeText.setText(chargeVal);
-                }
-                speedText.setText(speedVal);
-                currentText.setText(current.get(current.size() - 1));
-                voltageText.setText(voltage.get(voltage.size() - 1));
+                currentText.setText(discurrent);
+                voltageText.setText(disvoltage);
             }
         });
     }
     @Override
-    public void onConnect(BluetoothDevice device) {
-        Display("Connected to "+device.getName()+" - "+device.getAddress());
-        /*this.runOnUiThread(new Runnable() {
-            //@Override
-            //public void run() {
-            //    send.setEnabled(true);
-            //}
-        });*/
-    }
+    public void onConnect(BluetoothDevice device) {    }
 
     @Override
     public void onDisconnect(BluetoothDevice device, String message) {
-        Display("Disconnected!");
-        Display("Connecting again...");
         b.connectToDevice(device);
+        Display1(String.valueOf((int) Double.parseDouble(speed.get(speed.size() - 1))), current.get(current.size() - 1), voltage.get(voltage.size() - 1),charge.get(charge.size() - 1));
     }
 
     @Override
@@ -397,40 +219,36 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
             findNum = message.split("= ");
         }
         if(findNum[0].equals("MPH")){
-            latestSpeed = new Pair<>(Double.parseDouble(findNum[1]), timestamp);
-            //speedText.setText(findNum[1]);
             speed.add(findNum[1]);
             findNum[0] = "speed";
+            saveToFile(String.valueOf((int) Double.parseDouble(speed.get(speed.size() - 1))) , speedfileName);
         } else if(findNum[0].equals("current")){
-            //currentText.setText(findNum[1]);
-            latestCurrent = new Pair<>(Double.parseDouble(findNum[1]), timestamp);
             current.add(findNum[1]);
+            saveToFile(current.get(current.size() - 1), currentfileName);
         } else if(findNum[0].equals("INPUT V")){
-            latestVoltage = new Pair<>(Double.parseDouble(findNum[1]), timestamp);
             voltage.add(findNum[1]);
             findNum[0] = "voltage";
-        } else if(findNum[0].equals("charge")){
-            if(Double.parseDouble(findNum[1]) > batteryCapacity){
-                latestCharge = new Pair<>(Double.parseDouble(String.valueOf(batteryCapacity)), timestamp);
-            } else {
-                latestCharge = new Pair<>(Double.parseDouble(findNum[1]), timestamp);
-            }
-            findNum[1] = String.valueOf(latestCharge);
+            saveToFile(voltage.get(voltage.size() - 1), voltagefileName);
+        } else if(findNum[0].equals("SOC")){
             charge.add(findNum[1]);
-            //chargeText.setText(findNum[1]);
+            findNum[0] = "SOC";
+            saveToFile(charge.get(charge.size() - 1), chargefileName);
+        } else if(findNum[0].equals("milliseconds")){
+            time.add(findNum[1]);
+            findNum[0] = "time";
+            saveToFile(time.get(time.size() - 1), timefileName);
         }
-        Display1(speed, current, voltage,charge);
+        Display1(String.valueOf((int) Double.parseDouble(speed.get(speed.size() - 1))), current.get(current.size() - 1), voltage.get(voltage.size() - 1),charge.get(charge.size() - 1));
     }
 
     @Override
     public void onError(String message) {
-        Display("Error: "+message);
+        Display1(String.valueOf((int) Double.parseDouble(speed.get(speed.size() - 1))), current.get(current.size() - 1), voltage.get(voltage.size() - 1),charge.get(charge.size() - 1));
     }
 
     @Override
     public void onConnectError(final BluetoothDevice device, String message) {
-        Display("Error: "+message);
-        Display("Trying again in 3 sec.");
+        Display1(String.valueOf((int) Double.parseDouble(speed.get(speed.size() - 1))), current.get(current.size() - 1), voltage.get(voltage.size() - 1),charge.get(charge.size() - 1));
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
