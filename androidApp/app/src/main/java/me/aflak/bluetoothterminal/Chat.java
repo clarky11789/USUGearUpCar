@@ -96,6 +96,8 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         charge.add("0");
         current.add("0");
         voltage.add("0");
+        time.add("0");
+        time.add("0");
         carId = "1";
         unsentDataId = 0;
 
@@ -191,6 +193,14 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         }
     }
 
+    public void save(final String s_speed, final String s_current, final String s_voltage, final String s_SOC, final String s_time){
+            saveToFile(s_SOC, chargefileName);
+            saveToFile(s_current, currentfileName);
+            saveToFile(s_voltage, voltagefileName);
+            saveToFile(s_speed, speedfileName);
+            saveToFile(s_time, timefileName);
+    }
+
     public void Display1(final String speedVal,final String discurrent,final String disvoltage,final String discharge  ){
         this.runOnUiThread(new Runnable() {
             @Override
@@ -221,24 +231,20 @@ public class Chat extends AppCompatActivity implements Bluetooth.CommunicationCa
         if(findNum[0].equals("MPH")){
             speed.add(findNum[1]);
             findNum[0] = "speed";
-            saveToFile(String.valueOf((int) Double.parseDouble(speed.get(speed.size() - 1))) , speedfileName);
         } else if(findNum[0].equals("current")){
             current.add(findNum[1]);
-            saveToFile(current.get(current.size() - 1), currentfileName);
         } else if(findNum[0].equals("INPUT V")){
             voltage.add(findNum[1]);
             findNum[0] = "voltage";
-            saveToFile(voltage.get(voltage.size() - 1), voltagefileName);
         } else if(findNum[0].equals("SOC")){
             charge.add(findNum[1]);
             findNum[0] = "SOC";
-            saveToFile(charge.get(charge.size() - 1), chargefileName);
         } else if(findNum[0].equals("milliseconds")){
             time.add(findNum[1]);
             findNum[0] = "time";
-            saveToFile(time.get(time.size() - 1), timefileName);
+            save( speed.get(speed.size() - 1), current.get(current.size() - 1), voltage.get(voltage.size() - 1),charge.get(charge.size() - 1),time.get(time.size() - 1));
         }
-        Display1(String.valueOf((int) Double.parseDouble(speed.get(speed.size() - 1))), current.get(current.size() - 1), voltage.get(voltage.size() - 1),charge.get(charge.size() - 1));
+        Display1(speed.get(speed.size() - 1), current.get(current.size() - 1), voltage.get(voltage.size() - 1),charge.get(charge.size() - 1));
     }
 
     @Override
